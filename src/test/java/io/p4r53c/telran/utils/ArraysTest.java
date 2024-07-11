@@ -2,14 +2,45 @@ package io.p4r53c.telran.utils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Random;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ArraysTest {
 
-    int[] numbersArray = { 8, 3, 4, 55, -15, 16, 17, 18, 19 };
-    int[] emptyArray = {};
+    private static final int N_ELEMENTS = 1000;
+
+    private int[] numbersArray;
+    private int[] sortedNumbersArray;
+    private int[] emptyArray;
+
+    // Swapper fixtures
+    private int[] arrayOneSwapNeighbors;
+    private int[] arrayOneSwapNonNeighbors;
+    private int[] arrayMultipleSwaps;
+
+    /**
+     * Initializes the test fixture by setting up the arrays used for testing.
+     *
+     * This method is guaranteed an array integrity.
+     */
+    @BeforeEach
+    void setUp() {
+        numbersArray = new int[] { 8, 3, 4, 55, -15, 16, 17, 18, 19 };
+        sortedNumbersArray = new int[] { -15, 3, 4, 8, 16, 17, 18, 19, 55 };
+
+        emptyArray = new int[] {};
+
+        arrayOneSwapNeighbors = new int[] { 2, 1, 3, 4, 5 };
+        arrayOneSwapNonNeighbors = new int[] { 5, 2, 3, 1, 4 };
+        arrayMultipleSwaps = new int[] { 3, 1, 5, 2, 4 };
+
+    }
 
     @Test
     void testSearchByIndex() {
@@ -116,4 +147,94 @@ class ArraysTest {
             ArraysUtils.removeByArraycopy(numbersArray, 9);
         });
     }
+
+    // ---------------------------------------------------------------------------
+    //
+    // Sorting Methods Tests
+    //
+    // ---------------------------------------------------------------------------
+    @Test
+    void testSortByPushing() {
+        ArraysUtils.sortByPushing(numbersArray);
+        assertArrayEquals(sortedNumbersArray, numbersArray);
+    }
+
+    @Test
+    void testRandomArray() {
+        int[] randomArray = getRandomArray(N_ELEMENTS);
+        int limit = randomArray.length - 1;
+
+        ArraysUtils.sortByPushing(randomArray);
+
+        for (int i = 0; i < limit; i++) {
+            assertTrue(randomArray[i] <= randomArray[i + 1]);
+        }
+    }
+
+    @Test
+    void testBinarySearchKeyFound() { 
+        assertEquals(4, ArraysUtils.binarySearch(sortedNumbersArray, 16));
+    }
+
+    @Test
+    void testBinarySearchKeyNotFound() {
+        assertEquals(-1, ArraysUtils.binarySearch(sortedNumbersArray, 256));
+    }
+
+    // ------
+    @Test
+    void testInsertSortedEmptyArray() {
+        int[] expected = { 256 };
+        int[] result = ArraysUtils.insertSorted(emptyArray, 256);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    void testInsertSortedValueLessThanAllElements() {
+        int[] expected = { -256, -15, 3, 4, 8, 16, 17, 18, 19, 55 };
+        int[] result = ArraysUtils.insertSorted(sortedNumbersArray, -256);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    void testInsertSortedValueGreaterThanAllElements() {
+        int[] expected = { -15, 3, 4, 8, 16, 17, 18, 19, 55, 256 };
+        int[] result = ArraysUtils.insertSorted(sortedNumbersArray, 256);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    void testInsertSortedValueInMiddleOfArray() {
+        int[] expected = { -15, 3, 4, 8, 11, 16, 17, 18, 19, 55 };
+        int[] result = ArraysUtils.insertSorted(sortedNumbersArray, 11);
+        assertArrayEquals(expected, result);
+    }
+
+    // ------
+
+    @Test
+    void testIsOneSwapNeededNeighbors() {
+        assertTrue(ArraysUtils.isOneSwapNeeded(arrayOneSwapNeighbors));
+    }
+
+    void testIsOneSwapNeededNonNeighbors() {
+        assertTrue(ArraysUtils.isOneSwapNeeded(arrayOneSwapNonNeighbors));
+    }
+
+    @Test
+    void testIsOneSwapNeededMultipleSwaps() {
+        assertFalse(ArraysUtils.isOneSwapNeeded(arrayMultipleSwaps));
+    }
+
+    private int[] getRandomArray(int n) {
+        Random random = new Random();
+
+        int[] array = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            array[i] = random.nextInt();
+        }
+        return array;
+    }
+
 }

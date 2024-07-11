@@ -99,4 +99,144 @@ public class ArraysUtils {
         System.arraycopy(array, index + 1, result, index, array.length - index - 1);
         return result;
     }
+
+    // ---------------------------------------------------------------------------
+    //
+    // Arrays sorting
+    //
+    // ---------------------------------------------------------------------------
+    
+    /**
+     * Sorts an array in ascending order by pushing the maximum element to the end in each iteration.
+     *
+     *
+     * @param  array the array to be sorted
+     */
+    public static void sortByPushing(int[] array) {
+        int n = array.length;
+        boolean isSorted = false;
+
+        while (!isSorted) {
+
+            n--;
+            isSorted = pushMaxAtEndBySwap(array, n);
+        }
+    }
+
+    /**
+     * Searches for a given value in a sorted array and returns the index of the first
+     * occurrence.
+     *
+     * @param array the sorted array
+     * @param value the value to be searched for
+     * @return the index of the first occurrence of the value in the array, or -1 if
+     *         the value is not found
+     */
+    public static int binarySearch(int[] array, int value) {
+        int low = 0;
+        int high = array.length - 1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            
+            if (array[mid] == value) {
+                return mid;
+            } else if (array[mid] < value) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Inserts a value into a sorted array and returns the new sorted array.
+     *
+     * @param  array the sorted array
+     * @param  value the value to be inserted
+     * @return       the new sorted array with the value inserted
+     */
+    public static int[] insertSorted(int[] array, int value) {
+        int n = array.length;
+        int[] result = new int[n + 1];
+        int index = 0;
+
+        while (index < array.length && array[index] < value) {
+            index++;
+        }
+
+        System.arraycopy(array, 0, result, 0, index);
+        result[index] = value;
+        System.arraycopy(array, index, result, index + 1, array.length - index);
+
+        return result;
+    }
+
+    /**
+     * Determines if only one swap is needed to sort the array.
+     *
+     * @param  array the input array to be checked
+     * @return       true if only one swap is needed to sort the array, false otherwise
+     */
+    public static boolean isOneSwapNeeded(int[] array) {
+        int n = array.length;
+        int a = 0;
+        int b = n - 1;
+        int k = 0;
+
+        while (a < b && array[a] < array[a + 1]) {
+            a++;
+        }
+
+        while (a < b && array[b] > array[b - 1]) {
+            b--;
+        }
+
+        if (a >= b) {
+            return false;
+        }
+
+        swap(array, a, b);
+
+        while (k < n - 1) {
+            if (array[k] > array[k + 1]) {
+                return false;
+            }
+            k++;
+        }
+        return true;
+    }
+    
+    /**
+     * Swaps elements in the given array to move the maximum element to the end in each iteration.
+     *
+     * @param  array  the array to be sorted
+     * @param  n      the number of elements in the array to be sorted
+     * @return        true if no swaps were made, false otherwise
+     */
+    private static boolean pushMaxAtEndBySwap(int[] array, int n) {
+        boolean isSwapped = true;
+
+        for (int i = 0; i < n; i++) {
+            if (array[i] > array[i + 1]) {
+                isSwapped = false;
+                swap(array, i, i + 1);
+            }
+        }
+        return isSwapped;
+    }
+
+    /**
+     * Swaps two elements in the given array.
+     *
+     * @param  array  the array in which elements should be swapped
+     * @param  i      the index of the first element to be swapped
+     * @param  j      the index of the second element to be swapped
+     */
+    private static void swap(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
 }

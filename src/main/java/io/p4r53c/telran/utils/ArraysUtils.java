@@ -105,66 +105,70 @@ public class ArraysUtils {
     // Arrays sorting
     //
     // ---------------------------------------------------------------------------
-    
+
     /**
-     * Sorts an array in ascending order by pushing the maximum element to the end in each iteration.
+     * Sorts an array in ascending order by pushing the maximum element to the end
+     * in each iteration.
      *
      *
-     * @param  array the array to be sorted
+     * @param array the array to be sorted
      */
     public static void sortByPushing(int[] array) {
         int n = array.length;
         boolean isSorted = false;
 
         while (!isSorted) {
-
             n--;
             isSorted = pushMaxAtEndBySwap(array, n);
         }
     }
 
+
     /**
-     * Searches for a given value in a sorted array and returns the index of the first
-     * occurrence.
+     * Searches for a given value in a sorted array using binary search algorithm and returns the index of the first occurrence.
      *
-     * @param array the sorted array
-     * @param value the value to be searched for
-     * @return the index of the first occurrence of the value in the array, or -1 if
-     *         the value is not found
+     * @param  array  the sorted array
+     * @param  value  the value to be searched for
+     * @return        the index of the first occurrence of the value in the array, 
+     *                or insertion point which the key would be inserted into the array
      */
     public static int binarySearch(int[] array, int value) {
         int low = 0;
         int high = array.length - 1;
+        boolean isFound = false;
+        int key = 0;
 
         while (low <= high) {
-            int mid = (low + high) / 2;
-            
+            int mid = low + (high - low) / 2;
+
             if (array[mid] == value) {
-                return mid;
+                isFound = true;
+                key = mid;
+                break;
             } else if (array[mid] < value) {
                 low = mid + 1;
             } else {
                 high = mid - 1;
             }
         }
-        return -1;
+        return isFound ? key : -low - 1; 
     }
 
     /**
      * Inserts a value into a sorted array and returns the new sorted array.
      *
-     * @param  array the sorted array
-     * @param  value the value to be inserted
-     * @return       the new sorted array with the value inserted
+     * @param array the sorted array
+     * @param value the value to be inserted
+     * @return the new sorted array with the value inserted
      */
     public static int[] insertSorted(int[] array, int value) {
-        int n = array.length;
-        int[] result = new int[n + 1];
-        int index = 0;
+        int index = binarySearch(array, value);
 
-        while (index < array.length && array[index] < value) {
-            index++;
+        if (index < 0) {
+            index = -(index + 1);
         }
+
+        int[] result = new int[array.length + 1];
 
         System.arraycopy(array, 0, result, 0, index);
         result[index] = value;
@@ -176,14 +180,15 @@ public class ArraysUtils {
     /**
      * Determines if only one swap is needed to sort the array.
      *
-     * @param  array the input array to be checked
-     * @return       true if only one swap is needed to sort the array, false otherwise
+     * @param array the input array to be checked
+     * @return true if only one swap is needed to sort the array, false otherwise
      */
     public static boolean isOneSwapNeeded(int[] array) {
         int n = array.length;
         int a = 0;
         int b = n - 1;
-        int k = 0;
+        boolean isSorted = true;
+        boolean isSwapped = true;
 
         while (a < b && array[a] < array[a + 1]) {
             a++;
@@ -193,27 +198,23 @@ public class ArraysUtils {
             b--;
         }
 
-        if (a >= b) {
-            return false;
+        if (array[a] > array[b]) {
+            swap(array, a, b);
         }
 
-        swap(array, a, b);
-
-        while (k < n - 1) {
-            if (array[k] > array[k + 1]) {
-                return false;
-            }
-            k++;
+        for (int i = 1; i < n && isSorted; i++) {
+            isSorted = array[i] >= array[i - 1];
         }
-        return true;
+        return isSwapped == a < b && array[a] <= array[b] ? isSorted : a >= b;
     }
-    
+
     /**
-     * Swaps elements in the given array to move the maximum element to the end in each iteration.
+     * Swaps elements in the given array to move the maximum element to the end in
+     * each iteration.
      *
-     * @param  array  the array to be sorted
-     * @param  n      the number of elements in the array to be sorted
-     * @return        true if no swaps were made, false otherwise
+     * @param array the array to be sorted
+     * @param n     the number of elements in the array to be sorted
+     * @return true if no swaps were made, false otherwise
      */
     private static boolean pushMaxAtEndBySwap(int[] array, int n) {
         boolean isSwapped = true;
@@ -230,9 +231,9 @@ public class ArraysUtils {
     /**
      * Swaps two elements in the given array.
      *
-     * @param  array  the array in which elements should be swapped
-     * @param  i      the index of the first element to be swapped
-     * @param  j      the index of the second element to be swapped
+     * @param array the array in which elements should be swapped
+     * @param i     the index of the first element to be swapped
+     * @param j     the index of the second element to be swapped
      */
     private static void swap(int[] array, int i, int j) {
         int temp = array[i];

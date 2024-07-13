@@ -178,7 +178,7 @@ class ArraysTest {
 
     @Test
     void testBinarySearchKeyNotFound() {
-        assertEquals(-1, ArraysUtils.binarySearch(sortedNumbersArray, 256));
+        assertEquals(-10, ArraysUtils.binarySearch(sortedNumbersArray, 256));
     }
 
     // ------

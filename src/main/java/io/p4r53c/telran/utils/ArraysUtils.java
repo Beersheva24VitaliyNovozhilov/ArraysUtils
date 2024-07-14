@@ -2,6 +2,7 @@ package io.p4r53c.telran.utils;
 
 // I renamed this class to ArraysUtils to avoid using java.util.Arrays.* declarations in code. I don't like it :)
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Utility methods for working with arrays.
@@ -123,14 +124,14 @@ public class ArraysUtils {
         }
     }
 
-
     /**
-     * Searches for a given value in a sorted array using binary search algorithm and returns the index of the first occurrence.
+     * Searches for a given value in a sorted array using binary search algorithm
+     * and returns the index of the first occurrence.
      *
-     * @param  array  the sorted array
-     * @param  value  the value to be searched for
-     * @return        the index of the first occurrence of the value in the array, 
-     *                or insertion point which the key would be inserted into the array
+     * @param array the sorted array
+     * @param value the value to be searched for
+     * @return the index of the first occurrence of the value in the array,
+     *         or insertion point which the key would be inserted into the array
      */
     public static int binarySearch(int[] array, int value) {
         int low = 0;
@@ -151,7 +152,7 @@ public class ArraysUtils {
                 high = mid - 1;
             }
         }
-        return isFound ? key : -low - 1; 
+        return isFound ? key : -low - 1;
     }
 
     /**
@@ -184,28 +185,65 @@ public class ArraysUtils {
      * @return true if only one swap is needed to sort the array, false otherwise
      */
     public static boolean isOneSwapNeeded(int[] array) {
+        int[] tempArray = new int[array.length];
+
+        System.arraycopy(array, 0, tempArray, 0, array.length);
+
+        int firstIndex = findFirstUnsortedElementIndex(tempArray);
+        int secondIndex = findSecondUnsortedElementIndex(tempArray);
+
+        if (firstIndex < secondIndex) {
+            swap(tempArray, firstIndex, secondIndex);
+        }
+
+        // KISS! :)
+        return firstIndex <= secondIndex && isSorted(tempArray);
+    }
+
+    /**
+     * Finds the index of the first unsorted element in the given array.
+     *
+     * @param array the input array to search for the first unsorted element
+     * @return the index of the first unsorted element, or the last index if the
+     *         array is sorted
+     */
+    private static int findFirstUnsortedElementIndex(int[] array) {
         int n = array.length;
-        int a = 0;
-        int b = n - 1;
-        boolean isSorted = true;
-        boolean isSwapped = true;
+        int firstIndex = 0;
 
-        while (a < b && array[a] < array[a + 1]) {
-            a++;
+        while (firstIndex < n - 1 && array[firstIndex] <= array[firstIndex + 1]) {
+            firstIndex++;
         }
+        return firstIndex;
+    }
 
-        while (a < b && array[b] > array[b - 1]) {
-            b--;
-        }
+    /**
+     * Finds the index of the second unsorted element in the array.
+     *
+     * @param array the input array to search for the second unsorted element
+     * @return the index of the second unsorted element, or the last index if the
+     *         array is sorted
+     */
+    private static int findSecondUnsortedElementIndex(int[] array) {
+        int n = array.length;
+        int secondIndex = n - 1;
 
-        if (array[a] > array[b]) {
-            swap(array, a, b);
+        while (secondIndex > 0 && array[secondIndex] >= array[secondIndex - 1]) {
+            secondIndex--;
         }
+        return secondIndex;
+    }
 
-        for (int i = 1; i < n && isSorted; i++) {
-            isSorted = array[i] >= array[i - 1];
-        }
-        return isSwapped == a < b && array[a] <= array[b] ? isSorted : a >= b;
+    /**
+     * Checks if the given array is sorted in ascending order.
+     *
+     * @param array the array to be checked
+     * @return true if the array is sorted, false otherwise
+     */
+    private static boolean isSorted(int[] array) {
+        // For sake of simplicity.
+        // This method can be implemented by while loop but It's just a helper method.
+        return array.length != 0 && IntStream.range(1, array.length).noneMatch(i -> array[i - 1] > array[i]);
     }
 
     /**

@@ -3,6 +3,8 @@
 
 ## HWs
 
+[![Java CI with Maven](https://github.com/Beersheva24VitaliyNovozhilov/ArraysUtils/actions/workflows/maven.yml/badge.svg)](https://github.com/Beersheva24VitaliyNovozhilov/ArraysUtils/actions/workflows/maven.yml)
+
 * HW 5 - ArraysUtils basics
 * [HW 6 - Sorting arrays](#hw-6---sorting-arrays) [added 11.07.2024]
 

@@ -3,6 +3,8 @@
 
 ## HWs
 
+GHA Java CI pipeline status (build and test):
+
 [![Java CI with Maven](https://github.com/Beersheva24VitaliyNovozhilov/ArraysUtils/actions/workflows/maven.yml/badge.svg)](https://github.com/Beersheva24VitaliyNovozhilov/ArraysUtils/actions/workflows/maven.yml)
 
 * HW 5 - ArraysUtils basics

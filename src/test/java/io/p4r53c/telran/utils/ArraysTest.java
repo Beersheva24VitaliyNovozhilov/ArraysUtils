@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Comparator;
 import java.util.Random;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,17 @@ class ArraysTest {
     private int[] arrayOneSwapNonNeighbors;
     private int[] arrayMultipleSwaps;
 
+    // Comparator fixtures
+    private Integer[] sortedIntegerArray;
+
+    private String[] stringLenSortedStringArray;
+    private String[] stringArray;
+    private String[] stringAsciiSortedStringArray;
+
+    private User[] unsortedUsersArray;
+    private User[] sortedByIdUsersArray;
+    private User[] sortedByLoginUsersArray;
+
     /**
      * Initializes the test fixture by setting up the arrays used for testing.
      *
@@ -39,6 +51,36 @@ class ArraysTest {
         arrayOneSwapNeighbors = new int[] { 2, 1, 3, 4, 5 };
         arrayOneSwapNonNeighbors = new int[] { 5, 2, 3, 1, 4 };
         arrayMultipleSwaps = new int[] { 3, 1, 5, 2, 4 };
+
+        sortedIntegerArray = new Integer[] { -6, 1, 3, 4, 5, 7 };
+
+        stringArray = new String[] { "lmn", "cfta", "w", "aa" };
+        stringLenSortedStringArray = new String[] { "w", "aa", "lmn", "cfta" };
+        stringAsciiSortedStringArray = new String[] { "aa", "cfta", "lmn", "w" };
+
+        unsortedUsersArray = new User[] {
+                new User(3, "Yuri"),
+                new User(2, "User"),
+                new User(1, "Admin"),
+                new User(4, "Anna"),
+                new User(5, "Alex")
+        };
+
+        sortedByLoginUsersArray = new User[] {
+                new User(1, "Admin"),
+                new User(5, "Alex"),
+                new User(4, "Anna"),
+                new User(2, "User"),
+                new User(3, "Yuri")
+        };
+
+        sortedByIdUsersArray = new User[] {
+                new User(1, "Admin"),
+                new User(2, "User"),
+                new User(3, "Yuri"),
+                new User(4, "Anna"),
+                new User(5, "Alex")
+        };
 
     }
 
@@ -172,7 +214,7 @@ class ArraysTest {
     }
 
     @Test
-    void testBinarySearchKeyFound() { 
+    void testBinarySearchKeyFound() {
         assertEquals(4, ArraysUtils.binarySearch(sortedNumbersArray, 16));
     }
 
@@ -181,7 +223,6 @@ class ArraysTest {
         assertEquals(-10, ArraysUtils.binarySearch(sortedNumbersArray, 256));
     }
 
-    // ------
     @Test
     void testInsertSortedEmptyArray() {
         int[] expected = { 256 };
@@ -210,8 +251,6 @@ class ArraysTest {
         assertArrayEquals(expected, result);
     }
 
-    // ------
-
     @Test
     void testIsOneSwapNeededNeighbors() {
         assertTrue(ArraysUtils.isOneSwapNeeded(arrayOneSwapNeighbors));
@@ -237,4 +276,142 @@ class ArraysTest {
         return array;
     }
 
+    // ---------------------------------------------------------------------------
+    //
+    // Generics and Comparators Tests
+    //
+    // ---------------------------------------------------------------------------
+    @Test
+    void testComparatorSort() {
+        ArraysUtils.sort(stringArray, new AsciiComparator());
+        assertArrayEquals(stringAsciiSortedStringArray, stringArray);
+
+        ArraysUtils.sort(stringArray, new StringLenComparator());
+        assertArrayEquals(stringLenSortedStringArray, stringArray);
+    }
+
+    @Test
+    void testIntegerBinarySearchOwnImplComparator() {
+        assertEquals(3, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(4), new IntegerComparator()));
+
+        assertEquals(-3, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(2), new IntegerComparator()));
+
+        assertEquals(-1, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(-10), new IntegerComparator()));
+
+        assertEquals(-7, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(256), new IntegerComparator()));
+
+    }
+
+    /**
+     * Just demonstrate method for using a wrapper comparator implementation.
+     * 
+     * @see java.util.Integer.compare
+     */
+    @Test
+    void testIntegerSearchValueWithLibComparator() {
+        assertEquals(3, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(4), Integer::compare));
+
+        assertEquals(-3, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(2), Integer::compare));
+
+        assertEquals(-1, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(-10), Integer::compare));
+
+        assertEquals(-7, ArraysUtils.binarySearch(sortedIntegerArray,
+                Integer.valueOf(256), Integer::compare));
+    }
+
+    @Test
+    void testStringBinarySearchCustomComparator() {
+        assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "lmn", new StringLenComparator()));
+
+        assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "LMN", new StringLenComparator()));
+
+        assertEquals(1, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "aa", new StringLenComparator()));
+
+        assertEquals(-1, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "", new StringLenComparator()));
+
+        assertEquals(-5, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "comparator", new StringLenComparator()));
+    }
+
+    /**
+     * Just demonstrate method for using a wrapper comparator implementation.
+     * 
+     * @see java.util.Comparator.comparingInt
+     */
+    @Test
+    void testStringSearchValueWithLibComparator() {
+        assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "lmn", Comparator.comparingInt(String::length)));
+
+        // Anoder way String::compareToIgnoreCase
+        assertEquals(3, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "CFTA", Comparator.comparingInt(String::length)));
+
+        assertEquals(-1, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "", Comparator.comparingInt(String::length)));
+
+        assertEquals(-5, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "comparator", Comparator.comparingInt(String::length)));
+    }
+
+    // Simple Object sorting and search
+    @Test
+    void testUserSortByIdAndLogin() {
+        ArraysUtils.sort(unsortedUsersArray, new UserIdComparator());
+        assertArrayEquals(sortedByIdUsersArray, unsortedUsersArray);
+    }
+
+    @Test
+    void testUserSortByAsciiLogin() {
+        ArraysUtils.sort(unsortedUsersArray, new UserLoginComparator());
+        assertArrayEquals(sortedByLoginUsersArray, unsortedUsersArray);
+    }
+
+    @Test
+    void testBinarySearchUserByLogin() {
+
+        // User userId does not matter
+        User existUser1 = new User(0, "Anna");
+        User existUser2 = new User(0, "User");
+        User nonexistingUser1 = new User(0, "DeletedUser");
+        User nonexistingUser2 = new User(0, "Aaron");
+
+        int index = ArraysUtils.binarySearch(sortedByLoginUsersArray, existUser1, new UserLoginComparator());
+        int index2 = ArraysUtils.binarySearch(sortedByLoginUsersArray, existUser2, new UserLoginComparator());
+        int index3 = ArraysUtils.binarySearch(sortedByLoginUsersArray, nonexistingUser1, new UserLoginComparator());
+        int index4 = ArraysUtils.binarySearch(sortedByLoginUsersArray, nonexistingUser2, new UserLoginComparator());
+
+        assertEquals(2, index);
+        assertEquals(3, index2);
+        assertEquals(-4, index3);
+        assertEquals(-1, index4);
+    }
+
+    @Test
+    void testBinarySearchUserById() {
+
+        // userName does not matter
+        User existUser1 = new User(3, "Yuri");
+        User existUser2 = new User(4, "Vasya");
+        User nonexistingUser1 = new User(10, "DeletedUser");
+
+        int index = ArraysUtils.binarySearch(sortedByIdUsersArray, existUser1, new UserIdComparator());
+        int index2 = ArraysUtils.binarySearch(sortedByIdUsersArray, existUser2, new UserIdComparator());
+        int index3 = ArraysUtils.binarySearch(sortedByIdUsersArray, nonexistingUser1, new UserIdComparator());
+
+        assertEquals(2, index);
+        assertEquals(3, index2);
+        assertEquals(-6, index3);
+    }
 }

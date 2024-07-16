@@ -2,6 +2,7 @@ package io.p4r53c.telran.utils;
 
 // I renamed this class to ArraysUtils to avoid using java.util.Arrays.* declarations in code. I don't like it :)
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.IntStream;
 
 /**
@@ -168,7 +169,7 @@ public class ArraysUtils {
         if (index < 0) {
             index = -(index + 1);
         }
-        
+
         return insertByArraycopy(array, index, value);
     }
 
@@ -193,6 +194,68 @@ public class ArraysUtils {
         // KISS! :)
         return firstIndex <= secondIndex && isSorted(tempArray);
     }
+    // ---------------------------------------------------------------------------
+    //
+    // Generics and Comparators
+    //
+    // ---------------------------------------------------------------------------
+
+    public static <T> void sort(T[] array, Comparator<T> comparator) {
+        int n = array.length;
+        boolean isSorted = false;
+
+        do {
+            n--;
+            isSorted = true;
+            for (int i = 0; i < n; i++) {
+                if (comparator.compare(array[i], array[i + 1]) > 0) {
+                    swap(array, i, i + 1);
+                    isSorted = false;
+                }
+            }            
+        } while (!isSorted);
+    }
+
+    /**
+     * Binary search method to find the index of a specific value in the array using the provided comparator.
+     *
+     * @param  array      the array to search in
+     * @param  value      the value to search for
+     * @param  comparator the comparator to determine the ordering of the elements
+     * @return            the index of the value if found, otherwise a negative value 
+     *                    indicating where the value should be inserted
+     */
+    public static <T> int binarySearch(T[] array, T value, Comparator<T> comparator) {
+        int low = 0;
+        int high = array.length - 1;
+        boolean isFound = false;
+        int key = 0;
+        
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            int comparisonResult = comparator.compare(array[mid], value);
+
+            if (comparisonResult == 0) {
+                key = mid;
+                isFound = true;
+                break;
+            } else if (comparisonResult < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return isFound ? key : -low - 1;
+    }
+
+
+    // ---------------------------------------------------------------------------
+    //
+    // Private methods
+    //
+    // ---------------------------------------------------------------------------
 
     /**
      * Finds the index of the first unsorted element in the given array.
@@ -269,6 +332,20 @@ public class ArraysUtils {
      */
     private static void swap(int[] array, int i, int j) {
         int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    /**
+     * Swaps the elements at indices i and j in the given array.
+     *
+     * @param  array  the array in which elements should be swapped
+     * @param  i      the index of the first element to be swapped
+     * @param  j      the index of the second element to be swapped
+     * @param  <T>    the type of elements in the array
+     */
+    private static <T> void swap(T[] array, int i, int j) {
+        T temp = array[i];
         array[i] = array[j];
         array[j] = temp;
     }

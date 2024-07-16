@@ -168,14 +168,8 @@ public class ArraysUtils {
         if (index < 0) {
             index = -(index + 1);
         }
-
-        int[] result = new int[array.length + 1];
-
-        System.arraycopy(array, 0, result, 0, index);
-        result[index] = value;
-        System.arraycopy(array, index, result, index + 1, array.length - index);
-
-        return result;
+        
+        return insertByArraycopy(array, index, value);
     }
 
     /**

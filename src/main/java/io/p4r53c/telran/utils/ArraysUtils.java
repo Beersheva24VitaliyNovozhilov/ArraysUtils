@@ -298,12 +298,14 @@ public class ArraysUtils {
     /**
      * Finds elements in the given array that satisfy the given predicate and
      * returns them in a new array.
+     * 
+     * Perhaps, this method should be called "findByPredicate" because it changes input array.  
      *
      * @param array     the array to search for elements
      * @param predicate the predicate used to test elements
      * @return a new array containing the elements that satisfy the predicate
      */
-    public static <T> T[] findByPredicate(T[] array, Predicate<T> predicate) {
+    public static <T> T[] getSubArrayByPredicate(T[] array, Predicate<T> predicate) {
         int n = array.length;
 
         T[] result = Arrays.copyOf(array, 0);
@@ -318,12 +320,25 @@ public class ArraysUtils {
 
     /**
      * Removes elements from the given array based on a predicate.
+     * 
      *
      * @param array     the array from which elements will be removed
      * @param predicate the predicate used to test elements
      * @return a new array containing the elements that do not satisfy the predicate
      */
-    public static <T> T[] removeIf(T[] array, Predicate<T> predicate) {
+    public static <T> T[] removeIfbyGetSubArrayByPredicate(T[] array, Predicate<T> predicate) {
+        return getSubArrayByPredicate(array, predicate.negate());
+    }
+
+    /**
+     * Removes elements from the given array based on a predicate.
+     * Stream API is used.
+     *
+     * @param array     the array from which elements will be removed
+     * @param predicate the predicate used to test elements
+     * @return a new array containing the elements that do not satisfy the predicate
+     */
+    public static <T> T[] removeIfByStreamApiAndPredicate(T[] array, Predicate<T> predicate) {
         return Arrays.stream(array).filter(predicate.negate()).toArray(size -> Arrays.copyOf(array, size));
     }
 

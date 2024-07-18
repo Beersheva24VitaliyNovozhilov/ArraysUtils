@@ -458,8 +458,8 @@ class ArraysTest {
         Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -10, 99 };
         Integer[] actualResult = new Integer[] { 7, 13, 99 };
 
-        assertArrayEquals(actualResult, ArraysUtils.findByPredicate(inputArray, i -> i % 2 != 0));
-        assertArrayEquals(actualResult, ArraysUtils.findByPredicate(inputArray, new EvenOddPredicate()));
+        assertArrayEquals(actualResult, ArraysUtils.getSubArrayByPredicate(inputArray, i -> i % 2 != 0));
+        assertArrayEquals(actualResult, ArraysUtils.getSubArrayByPredicate(inputArray, new EvenOddPredicate()));
     }
 
     @Test
@@ -468,9 +468,11 @@ class ArraysTest {
         Predicate<Integer> oddPredicate = num -> num % 2 != 0;
 
         Integer[] expectedResult = { 2, 4, 6 };
-        Integer[] actualResult = ArraysUtils.removeIf(inputArray, oddPredicate);
+        Integer[] actualResult = ArraysUtils.removeIfbyGetSubArrayByPredicate(inputArray, oddPredicate);
+        Integer[] actualResultStream = ArraysUtils.removeIfByStreamApiAndPredicate(inputArray, oddPredicate);
 
         assertArrayEquals(expectedResult, actualResult);
+        assertArrayEquals(actualResultStream, actualResult);
     }
 
     @Test
@@ -479,8 +481,10 @@ class ArraysTest {
         Predicate<Integer> evenPredicate = num -> num % 2 == 0;
 
         Integer[] expectedResult = { 1, 3, 5 };
-        Integer[] actualResult = ArraysUtils.removeIf(inputArray, evenPredicate);
+        Integer[] actualResult = ArraysUtils.removeIfbyGetSubArrayByPredicate(inputArray, evenPredicate);
+        Integer[] actualResultStream = ArraysUtils.removeIfByStreamApiAndPredicate(inputArray, evenPredicate);
 
         assertArrayEquals(expectedResult, actualResult);
+        assertArrayEquals(actualResultStream, actualResult);
     }
 }

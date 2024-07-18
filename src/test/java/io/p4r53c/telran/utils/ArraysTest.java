@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Comparator;
 import java.util.Random;
+import java.util.function.Predicate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ class ArraysTest {
     private User[] unsortedUsersArray;
     private User[] sortedByIdUsersArray;
     private User[] sortedByLoginUsersArray;
+
+    private Person[] sortedPersonsArray;
 
     /**
      * Initializes the test fixture by setting up the arrays used for testing.
@@ -80,6 +83,13 @@ class ArraysTest {
                 new User(3, "Yuri"),
                 new User(4, "Anna"),
                 new User(5, "Alex")
+        };
+
+        sortedPersonsArray = new Person[] {
+                new Person(1, "Vasya"),
+                new Person(2, "Anna"),
+                new Person(3, "Yuri"),
+                new Person(4, "Aaron")
         };
 
     }
@@ -354,7 +364,7 @@ class ArraysTest {
         assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
                 "lmn", Comparator.comparingInt(String::length)));
 
-        // Anoder way String::compareToIgnoreCase
+        // Another way String::compareToIgnoreCase
         assertEquals(3, ArraysUtils.binarySearch(stringLenSortedStringArray,
                 "CFTA", Comparator.comparingInt(String::length)));
 
@@ -381,7 +391,7 @@ class ArraysTest {
     @Test
     void testBinarySearchUserByLogin() {
 
-        // User userId does not matter
+        // userId does not matter
         User existUser1 = new User(0, "Anna");
         User existUser2 = new User(0, "User");
         User nonexistingUser1 = new User(0, "DeletedUser");
@@ -413,5 +423,64 @@ class ArraysTest {
         assertEquals(2, index);
         assertEquals(3, index2);
         assertEquals(-6, index3);
+    }
+
+    // --- HW8 ---
+
+    @Test
+    void testBinarySearchWihoutExternalComparator() {
+        Person person = new Person(1, "Vasya");
+
+        assertEquals(1, ArraysUtils.binarySearch(stringAsciiSortedStringArray, "cfta"));
+        assertEquals(0, ArraysUtils.binarySearch(sortedPersonsArray, person));
+        assertEquals(-5, ArraysUtils.binarySearch(sortedPersonsArray, new Person(5, "DeletedUser")));
+
+        // Test binarySearchByPredicate()
+        assertEquals(1, ArraysUtils.binarySearchByExplicitPredicate(stringAsciiSortedStringArray, "cfta"));
+        assertEquals(0, ArraysUtils.binarySearchByExplicitPredicate(sortedPersonsArray, person));
+        assertEquals(-5, ArraysUtils.binarySearchByExplicitPredicate(sortedPersonsArray, new Person(5, "DeletedUser")));
+    }
+
+    // I did not add the following fixtures to setUp() init for convenience.
+    // Separate this test class.
+    @Test
+    void evenOddSort() {
+        Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -10, 99 };
+        Integer[] actualResult = new Integer[] { -100, -10, -8, 10, 99, 13, 7 };
+
+        ArraysUtils.sort(inputArray, new EvenOddComparator());
+        assertArrayEquals(actualResult, inputArray);
+
+    }
+
+    @Test
+    void testFindByPredicate() {
+        Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -10, 99 };
+        Integer[] actualResult = new Integer[] { 7, 13, 99 };
+
+        assertArrayEquals(actualResult, ArraysUtils.findByPredicate(inputArray, i -> i % 2 != 0));
+        assertArrayEquals(actualResult, ArraysUtils.findByPredicate(inputArray, new EvenOddPredicate()));
+    }
+
+    @Test
+    void testRemoveIfOdd() {
+        Integer[] inputArray = { 1, 2, 3, 4, 5, 6 };
+        Predicate<Integer> oddPredicate = num -> num % 2 != 0;
+
+        Integer[] expectedResult = { 2, 4, 6 };
+        Integer[] actualResult = ArraysUtils.removeIf(inputArray, oddPredicate);
+
+        assertArrayEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    void testRemoveIfEven() {
+        Integer[] inputArray = { 1, 2, 3, 4, 5, 6 };
+        Predicate<Integer> evenPredicate = num -> num % 2 == 0;
+
+        Integer[] expectedResult = { 1, 3, 5 };
+        Integer[] actualResult = ArraysUtils.removeIf(inputArray, evenPredicate);
+
+        assertArrayEquals(expectedResult, actualResult);
     }
 }

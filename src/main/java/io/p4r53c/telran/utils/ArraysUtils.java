@@ -3,6 +3,7 @@ package io.p4r53c.telran.utils;
 // I renamed this class to ArraysUtils to avoid using java.util.Arrays.* declarations in code. I don't like it :)
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 /**
@@ -200,6 +201,12 @@ public class ArraysUtils {
     //
     // ---------------------------------------------------------------------------
 
+    /**
+     * Sorts an array of elements using the provided comparator.
+     *
+     * @param array      the array to be sorted
+     * @param comparator the comparator to determine the order of the elements
+     */
     public static <T> void sort(T[] array, Comparator<T> comparator) {
         int n = array.length;
         boolean isSorted = false;
@@ -212,25 +219,26 @@ public class ArraysUtils {
                     swap(array, i, i + 1);
                     isSorted = false;
                 }
-            }            
+            }
         } while (!isSorted);
     }
 
     /**
-     * Binary search method to find the index of a specific value in the array using the provided comparator.
+     * Binary search method to find the index of a specific value in the array using
+     * the provided comparator.
      *
-     * @param  array      the array to search in
-     * @param  value      the value to search for
-     * @param  comparator the comparator to determine the ordering of the elements
-     * @return            the index of the value if found, otherwise a negative value 
-     *                    indicating where the value should be inserted
+     * @param array      the array to search in
+     * @param value      the value to search for
+     * @param comparator the comparator to determine the ordering of the elements
+     * @return the index of the value if found, otherwise a negative value
+     *         indicating where the value should be inserted
      */
     public static <T> int binarySearch(T[] array, T value, Comparator<T> comparator) {
         int low = 0;
         int high = array.length - 1;
         boolean isFound = false;
         int key = 0;
-        
+
         while (low <= high) {
             int mid = low + (high - low) / 2;
 
@@ -250,6 +258,74 @@ public class ArraysUtils {
         return isFound ? key : -low - 1;
     }
 
+    /**
+     * Performs a binary search on a sorted array of elements of type T.
+     * 
+     * This is a type constraint that specifies that type {@code T} must implement
+     * the {@code Comparable} interface and can be compared with other objects of
+     * type {@code T}.
+     *
+     * The constraint can be extended up to a superclass by
+     * {@code <T extends Comparable<? super T>>} then type {@code T} can be
+     * comparable to itself or to any of its superclasses.
+     * But this does not make sense in the context of the current task.
+     * 
+     * @param array the sorted array to be searched
+     * @param value the value to be found
+     * @return the index of the value if found, otherwise a negative value
+     *         indicating where the value should be inserted
+     */
+    public static <T extends Comparable<T>> int binarySearch(T[] array, T value) {
+        return binarySearch(array, value, Comparator.naturalOrder());
+    }
+
+    /**
+     * Performs an another binary search on the array using lambda explicit
+     * predicate to determine the value.
+     * 
+     * This method cannot be overloaded for obvious reasons, so it has a different
+     * name, but it is covered by the same tests.
+     *
+     * @param array the array to be searched
+     * @param value the value to be searched for
+     * @return the index of the value if found, otherwise a negative value
+     *         indicating where the value should be inserted
+     */
+    public static <T extends Comparable<T>> int binarySearchByExplicitPredicate(T[] array, T value) {
+        return binarySearch(array, value, Comparator.comparing(((T t) -> t)));
+    }
+
+    /**
+     * Finds elements in the given array that satisfy the given predicate and
+     * returns them in a new array.
+     *
+     * @param array     the array to search for elements
+     * @param predicate the predicate used to test elements
+     * @return a new array containing the elements that satisfy the predicate
+     */
+    public static <T> T[] findByPredicate(T[] array, Predicate<T> predicate) {
+        int n = array.length;
+
+        T[] result = Arrays.copyOf(array, 0);
+
+        for (int i = 0; i < n; i++) {
+            if (predicate.test(array[i])) {
+                result = insertSorted(result, result.length, array[i]);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Removes elements from the given array based on a predicate.
+     *
+     * @param array     the array from which elements will be removed
+     * @param predicate the predicate used to test elements
+     * @return a new array containing the elements that do not satisfy the predicate
+     */
+    public static <T> T[] removeIf(T[] array, Predicate<T> predicate) {
+        return Arrays.stream(array).filter(predicate.negate()).toArray(size -> Arrays.copyOf(array, size));
+    }
 
     // ---------------------------------------------------------------------------
     //
@@ -304,6 +380,24 @@ public class ArraysUtils {
     }
 
     /**
+     * Inserts a value into a sorted array at the specified index, maintaining the
+     * sorted order.
+     *
+     * @param array the sorted array to be inserted into
+     * @param index the index at which the value should be inserted
+     * @param value the value to be inserted
+     * @return a new array with the value inserted at the specified index
+     */
+    private static <T> T[] insertSorted(T[] array, int index, T value) {
+        T[] result = Arrays.copyOf(array, array.length + 1);
+
+        System.arraycopy(array, index, result, index + 1, array.length - index);
+        result[index] = value;
+
+        return result;
+    }
+
+    /**
      * Swaps elements in the given array to move the maximum element to the end in
      * each iteration.
      *
@@ -339,10 +433,10 @@ public class ArraysUtils {
     /**
      * Swaps the elements at indices i and j in the given array.
      *
-     * @param  array  the array in which elements should be swapped
-     * @param  i      the index of the first element to be swapped
-     * @param  j      the index of the second element to be swapped
-     * @param  <T>    the type of elements in the array
+     * @param array the array in which elements should be swapped
+     * @param i     the index of the first element to be swapped
+     * @param j     the index of the second element to be swapped
+     * @param <T>   the type of elements in the array
      */
     private static <T> void swap(T[] array, int i, int j) {
         T temp = array[i];

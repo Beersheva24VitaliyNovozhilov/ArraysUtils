@@ -261,22 +261,18 @@ public class ArraysUtils {
     /**
      * Performs a binary search on a sorted array of elements of type T.
      * 
-     * This is a type constraint that specifies that type {@code T} must implement
-     * the {@code Comparable} interface and can be compared with other objects of
-     * type {@code T}.
-     *
-     * The constraint can be extended up to a superclass by
-     * {@code <T extends Comparable<? super T>>} then type {@code T} can be
-     * comparable to itself or to any of its superclasses.
-     * But this does not make sense in the context of the current task.
+     * Without changing of signature.
      * 
-     * @param array the sorted array to be searched
+     * @param array the array to be searched
      * @param value the value to be found
      * @return the index of the value if found, otherwise a negative value
      *         indicating where the value should be inserted
      */
-    public static <T extends Comparable<T>> int binarySearch(T[] array, T value) {
-        return binarySearch(array, value, Comparator.naturalOrder());
+    public static <T> int binarySearch(T[] array, T value) {
+        return binarySearch(array, value, Comparator.comparing(T::toString));
+        // return binarySearch(array, value, (t1, t2) -> ((Comparable<T>)
+        // t1).compareTo(t2)); // Same as above, Bad classcasting
+        // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); // Same as above, Bad classcasting
     }
 
     /**
@@ -299,7 +295,8 @@ public class ArraysUtils {
      * Finds elements in the given array that satisfy the given predicate and
      * returns them in a new array.
      * 
-     * Perhaps, this method should be called "findByPredicate" because it changes input array.  
+     * Perhaps, this method should be called "findByPredicate" because it changes
+     * input array.
      *
      * @param array     the array to search for elements
      * @param predicate the predicate used to test elements

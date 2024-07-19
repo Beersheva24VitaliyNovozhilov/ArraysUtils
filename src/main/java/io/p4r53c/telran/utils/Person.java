@@ -63,4 +63,9 @@ public class Person implements Comparable<Person> {
     public int hashCode() {
         return 31 * Long.hashCode(id) + name.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "Person [id=" + this.id + ", name=" + this.name + "]";
+    }
 }

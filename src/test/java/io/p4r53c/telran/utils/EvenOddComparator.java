@@ -17,15 +17,10 @@ public class EvenOddComparator implements Comparator<Integer> {
 
     @Override
     public int compare(Integer obj1, Integer obj2) {
-        int even1 = obj1 % 2;
-        int even2 = obj2 % 2;
+        boolean isEven1 = obj1 % 2 == 0;
+        boolean isEven2 = obj2 % 2 == 0;
 
-        int compare = Integer.compare(even1, even2);
-
-        if (compare == 0) {
-            compare = even1 == 0 ? Integer.compare(obj1, obj2) : Integer.compare(obj2, obj1);
-        }
-        return compare;
+        return (isEven1 == isEven2)
+                ? (isEven1 ? obj1 - obj2 : obj2 - obj1) : (isEven1 ? -1 : 1);
     }
-
 }

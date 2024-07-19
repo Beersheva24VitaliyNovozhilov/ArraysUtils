@@ -444,13 +444,12 @@ class ArraysTest {
     // I did not add the following fixtures to setUp() init for convenience.
     // Separate this test class.
     @Test
-    void evenOddSort() {
-        Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -10, 99 };
-        Integer[] actualResult = new Integer[] { -100, -10, -8, 10, 99, 13, 7 };
+    void testEvenOddSort() {
+        Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -5, -10, 99};
+        Integer[] actualResult = new Integer[] { -100, -10, -8, 10, 99, 13, 7, -5 };
 
         ArraysUtils.sort(inputArray, new EvenOddComparator());
-        assertArrayEquals(actualResult, inputArray);
-
+        assertArrayEquals(actualResult, inputArray, actualResult.toString());
     }
 
     @Test

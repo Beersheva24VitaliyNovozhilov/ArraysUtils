@@ -445,11 +445,11 @@ class ArraysTest {
     // Separate this test class.
     @Test
     void testEvenOddSort() {
-        Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -5, -10, 99};
-        Integer[] actualResult = new Integer[] { -100, -10, -8, 10, 99, 13, 7, -5 };
+        Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -5, -3, -10, 99 };
+        Integer[] actualResult = new Integer[] { -100, -10, -8, 10, 99, 13, 7, -3, -5 };
 
         ArraysUtils.sort(inputArray, new EvenOddComparator());
-        assertArrayEquals(actualResult, inputArray, actualResult.toString());
+        assertArrayEquals(actualResult, inputArray);
     }
 
     @Test

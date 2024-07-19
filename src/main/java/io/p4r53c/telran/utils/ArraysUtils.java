@@ -270,8 +270,7 @@ public class ArraysUtils {
      */
     public static <T> int binarySearch(T[] array, T value) {
         return binarySearch(array, value, Comparator.comparing(T::toString));
-        // return binarySearch(array, value, (t1, t2) -> ((Comparable<T>)
-        // t1).compareTo(t2)); // Same as above, Bad classcasting
+        // return binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2)); // Same as above, Bad classcasting
         // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); // Same as above, Bad classcasting
     }
 

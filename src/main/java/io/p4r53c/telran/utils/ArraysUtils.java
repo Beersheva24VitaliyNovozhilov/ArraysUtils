@@ -269,9 +269,11 @@ public class ArraysUtils {
      *         indicating where the value should be inserted
      */
     public static <T> int binarySearch(T[] array, T value) {
-        return binarySearch(array, value, Comparator.comparing(T::toString));
-        // return binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2)); // Same as above, Bad classcasting
-        // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); // Same as above, Bad classcasting
+        return binarySearch(array, value, Comparator.comparing(T::toString)); // No classcasting, but bad performance
+        // binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2)); // Same as above, classcasting
+        // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); // Same as above, classcasting
+        // Actually, standard implementation do classcasting, and it is costless operation. 
+        // So in this case from efficiency POV more preferrable to use casting to Comparator.
     }
 
     /**

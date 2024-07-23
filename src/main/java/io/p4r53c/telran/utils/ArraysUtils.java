@@ -1,8 +1,10 @@
 package io.p4r53c.telran.utils;
 
+import java.util.ArrayList;
 // I renamed this class to ArraysUtils to avoid using java.util.Arrays.* declarations in code. I don't like it :)
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -270,10 +272,14 @@ public class ArraysUtils {
      */
     public static <T> int binarySearch(T[] array, T value) {
         return binarySearch(array, value, Comparator.comparing(T::toString)); // No classcasting, but bad performance
-        // binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2)); // Same as above, classcasting
-        // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); // Same as above, classcasting
-        // Actually, standard implementation do classcasting, and it is costless operation. 
-        // So in this case from efficiency POV more preferrable to use casting to Comparator.
+        // binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2));
+        // // Same as above, classcasting
+        // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); //
+        // Same as above, classcasting
+        // Actually, standard implementation do classcasting, and it is costless
+        // operation.
+        // So in this case from efficiency POV more preferrable to use casting to
+        // Comparator.
     }
 
     /**
@@ -338,6 +344,37 @@ public class ArraysUtils {
      */
     public static <T> T[] removeIfByStreamApiAndPredicate(T[] array, Predicate<T> predicate) {
         return Arrays.stream(array).filter(predicate.negate()).toArray(size -> Arrays.copyOf(array, size));
+    }
+
+    /**
+     * A method to match rules for a given array of characters based on mustBeRules
+     * and mustNotBeRules.
+     *
+     * @param array          the array of characters to match rules against
+     * @param mustBeRules    an array of character rules that must be satisfied
+     * @param mustNotBeRules an array of character rules that must not be satisfied
+     * @return a string describing the result of matching the rules or empty string
+     *         if matches all rules and specified error message what rules don't
+     *         match
+     */
+    public static String matchesRules(char[] array, CharacterRule[] mustBeRules, CharacterRule[] mustNotBeRules) {
+        List<String> errors = new ArrayList<>();
+
+        for (CharacterRule rule : mustBeRules) {
+            rule.setSatisfied(rule.verify(array));
+            if (!rule.isSatisfied()) {
+                errors.add(rule.getErrorString());
+            }
+        }
+
+        for (CharacterRule rule : mustNotBeRules) {
+            rule.setSatisfied(rule.verify(array));
+            if (rule.isSatisfied()) {
+                errors.add(rule.getErrorString());
+            }
+        }
+
+        return String.join(", ", errors);
     }
 
     // ---------------------------------------------------------------------------

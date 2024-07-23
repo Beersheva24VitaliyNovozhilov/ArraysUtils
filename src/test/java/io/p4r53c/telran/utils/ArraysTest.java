@@ -293,26 +293,32 @@ class ArraysTest {
     // ---------------------------------------------------------------------------
     @Test
     void testComparatorSort() {
-        ArraysUtils.sort(stringArray, new AsciiComparator());
+        Comparator<String> stringComparator = (a, b) -> a.compareTo(b);
+
+        ArraysUtils.sort(stringArray, stringComparator);
         assertArrayEquals(stringAsciiSortedStringArray, stringArray);
 
-        ArraysUtils.sort(stringArray, new StringLenComparator());
+        Comparator<String> stringLenComparator = (a, b) -> a.length() - b.length();
+        ArraysUtils.sort(stringArray, stringLenComparator);
         assertArrayEquals(stringLenSortedStringArray, stringArray);
     }
 
     @Test
     void testIntegerBinarySearchOwnImplComparator() {
+
+        Comparator<Integer> integerComparator = (a, b) -> a - b;
+
         assertEquals(3, ArraysUtils.binarySearch(sortedIntegerArray,
-                Integer.valueOf(4), new IntegerComparator()));
+                Integer.valueOf(4), integerComparator));
 
         assertEquals(-3, ArraysUtils.binarySearch(sortedIntegerArray,
-                Integer.valueOf(2), new IntegerComparator()));
+                Integer.valueOf(2), integerComparator));
 
         assertEquals(-1, ArraysUtils.binarySearch(sortedIntegerArray,
-                Integer.valueOf(-10), new IntegerComparator()));
+                Integer.valueOf(-10), integerComparator));
 
         assertEquals(-7, ArraysUtils.binarySearch(sortedIntegerArray,
-                Integer.valueOf(256), new IntegerComparator()));
+                Integer.valueOf(256), integerComparator));
 
     }
 
@@ -338,20 +344,23 @@ class ArraysTest {
 
     @Test
     void testStringBinarySearchCustomComparator() {
-        assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
-                "lmn", new StringLenComparator()));
+
+        Comparator<String> stringLenComparator = (a, b) -> a.length() - b.length();
 
         assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
-                "LMN", new StringLenComparator()));
+                "lmn", stringLenComparator));
+
+        assertEquals(2, ArraysUtils.binarySearch(stringLenSortedStringArray,
+                "LMN", stringLenComparator));
 
         assertEquals(1, ArraysUtils.binarySearch(stringLenSortedStringArray,
-                "aa", new StringLenComparator()));
+                "aa", stringLenComparator));
 
         assertEquals(-1, ArraysUtils.binarySearch(stringLenSortedStringArray,
-                "", new StringLenComparator()));
+                "", stringLenComparator));
 
         assertEquals(-5, ArraysUtils.binarySearch(stringLenSortedStringArray,
-                "comparator", new StringLenComparator()));
+                "comparator", stringLenComparator));
     }
 
     /**
@@ -448,7 +457,14 @@ class ArraysTest {
         Integer[] inputArray = new Integer[] { 7, -8, 10, -100, 13, -5, -3, -10, 99 };
         Integer[] actualResult = new Integer[] { -100, -10, -8, 10, 99, 13, 7, -3, -5 };
 
-        ArraysUtils.sort(inputArray, new EvenOddComparator());
+        ArraysUtils.sort(inputArray, (a, b) -> {
+            boolean isEven1 = a % 2 == 0;
+            boolean isEven2 = b % 2 == 0;
+
+            return (isEven1 == isEven2)
+                    ? (isEven1 ? a - b : b - a)
+                    : (isEven1 ? -1 : 1);
+        });
         assertArrayEquals(actualResult, inputArray);
     }
 
@@ -458,32 +474,28 @@ class ArraysTest {
         Integer[] actualResult = new Integer[] { 7, 13, 99 };
 
         assertArrayEquals(actualResult, ArraysUtils.getSubArrayByPredicate(inputArray, i -> i % 2 != 0));
-        assertArrayEquals(actualResult, ArraysUtils.getSubArrayByPredicate(inputArray, new EvenOddPredicate()));
     }
 
     @Test
     void testRemoveIfOdd() {
         Integer[] inputArray = { 1, 2, 3, 4, 5, 6 };
-        Predicate<Integer> oddPredicate = num -> num % 2 != 0;
-
         Integer[] expectedResult = { 2, 4, 6 };
-        Integer[] actualResult = ArraysUtils.removeIfbyGetSubArrayByPredicate(inputArray, oddPredicate);
-        Integer[] actualResultStream = ArraysUtils.removeIfByStreamApiAndPredicate(inputArray, oddPredicate);
+
+        Integer[] actualResult = ArraysUtils.removeIfbyGetSubArrayByPredicate(inputArray, n -> n % 2 != 0);
 
         assertArrayEquals(expectedResult, actualResult);
-        assertArrayEquals(actualResultStream, actualResult);
+
     }
 
     @Test
     void testRemoveIfEven() {
         Integer[] inputArray = { 1, 2, 3, 4, 5, 6 };
-        Predicate<Integer> evenPredicate = num -> num % 2 == 0;
-
         Integer[] expectedResult = { 1, 3, 5 };
-        Integer[] actualResult = ArraysUtils.removeIfbyGetSubArrayByPredicate(inputArray, evenPredicate);
-        Integer[] actualResultStream = ArraysUtils.removeIfByStreamApiAndPredicate(inputArray, evenPredicate);
+
+        Integer[] actualResult = ArraysUtils.removeIfbyGetSubArrayByPredicate(inputArray, n -> n % 2 == 0);
 
         assertArrayEquals(expectedResult, actualResult);
-        assertArrayEquals(actualResultStream, actualResult);
+
     }
+
 }

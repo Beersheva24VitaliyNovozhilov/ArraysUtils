@@ -11,7 +11,7 @@ GHA Java CI pipeline status (build and test):
 * HW 6 - Sorting arrays [added 11.07.2024]
 * HW 7 - Generics and Comparators [added 16.07.2024]
 * HW 8 - Next on Generics and Comparators [added 18.07.2024]
-         (Interfaces and Predicates)
+* HW 9 - FI/Lambdas
 
 Utility methods for working with arrays. Sorting, Searching, and other operations.
 

@@ -2,12 +2,9 @@ package io.p4r53c.telran.utils;
 
 import io.p4r53c.telran.utils.emums.ErrorString;
 
-import java.util.ArrayList;
-// I renamed this class to ArraysUtils to avoid using java.util.Arrays.* declarations in code. I don't like it :)
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -276,14 +273,14 @@ public class ArraysUtils {
      */
     public static <T> int binarySearch(T[] array, T value) {
         return binarySearch(array, value, Comparator.comparing(T::toString)); // No classcasting, but bad performance
-        // binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2));
-        // // Same as above, classcasting
-        // binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); //
-        // Same as above, classcasting
-        // Actually, standard implementation do classcasting, and it is costless
-        // operation.
-        // So in this case from efficiency POV more preferrable to use casting to
-        // Comparator.
+        /*
+         * binarySearch(array, value, (t1, t2) -> ((Comparable<T>) t1).compareTo(t2)); Same as above, classcasting
+         * binarySearch(array, value, (Comparator<T>) Comparator.naturalOrder()); Same as above, classcasting
+         * 
+         * Actually, standard implementation do classcasting, and it is costless operation.
+         * So in this case from efficiency POV more preferrable to use casting to Comparator.
+         * 
+         */
     }
 
     /**
@@ -505,12 +502,17 @@ public class ArraysUtils {
      * @param mustBeSatisfied the array to store the satisfaction of each rule
      */
     private static void checkMustBeRules(char[] array, CharacterRule[] mustBeRules, boolean[] mustBeSatisfied) {
-        for (char ch : array) {
-            for (int i = 0; i < mustBeRules.length; i++) {
-                if (mustBeRules[i].predicate.test(ch)) {
-                    mustBeSatisfied[i] = true;
+        int i = 0;
+        while (i < array.length) {
+            char ch = array[i];
+            int j = 0;
+            while (j < mustBeRules.length) {
+                if (mustBeRules[j].predicate.test(ch)) {
+                    mustBeSatisfied[j] = true;
                 }
+                j++;
             }
+            i++;
         }
     }
 
@@ -528,12 +530,19 @@ public class ArraysUtils {
      */
     private static void checkMustNotBeRules(char[] array, CharacterRule[] mustNotBeRules, Set<ErrorString> addedErrors,
             StringBuilder errorMessages) {
-        for (char ch : array) {
-            for (CharacterRule rule : mustNotBeRules) {
-                if (rule.predicate.test(ch) && addedErrors.add(rule.errorString)) {
-                    appendErrorMessage(errorMessages, rule.errorString);
+        int i = 0;
+
+        while (i < array.length) {
+            char ch = array[i];
+            int j = 0;
+
+            while (j < mustNotBeRules.length) {
+                if (mustNotBeRules[j].predicate.test(ch) && addedErrors.add(mustNotBeRules[j].errorString)) {
+                    appendErrorMessage(errorMessages, mustNotBeRules[j].errorString);
                 }
+                j++;
             }
+            i++;
         }
     }
 
@@ -548,10 +557,13 @@ public class ArraysUtils {
      */
     private static void accumulateErrors(CharacterRule[] mustBeRules, boolean[] mustBeSatisfied,
             Set<ErrorString> addedErrors, StringBuilder errorMessages) {
-        for (int i = 0; i < mustBeRules.length; i++) {
+        int i = 0;
+
+        while (i < mustBeRules.length) {
             if (!mustBeSatisfied[i] && mustBeRules[i].isSatisfied && addedErrors.add(mustBeRules[i].errorString)) {
                 appendErrorMessage(errorMessages, mustBeRules[i].errorString);
             }
+            i++;
         }
     }
 

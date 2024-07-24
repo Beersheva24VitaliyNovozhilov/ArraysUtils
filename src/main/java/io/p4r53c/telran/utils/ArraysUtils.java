@@ -1,10 +1,14 @@
 package io.p4r53c.telran.utils;
 
+import io.p4r53c.telran.utils.emums.ErrorString;
+
 import java.util.ArrayList;
 // I renamed this class to ArraysUtils to avoid using java.util.Arrays.* declarations in code. I don't like it :)
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -347,34 +351,30 @@ public class ArraysUtils {
     }
 
     /**
-     * A method to match rules for a given array of characters based on mustBeRules
-     * and mustNotBeRules.
+     * Checks if the given character array satisfies the rules defined in the given
+     * arrays of
+     * must-be and must-not-be rules. Returns a string containing error messages for
+     * any rules
+     * that are not satisfied.
      *
-     * @param array          the array of characters to match rules against
-     * @param mustBeRules    an array of character rules that must be satisfied
-     * @param mustNotBeRules an array of character rules that must not be satisfied
-     * @return a string describing the result of matching the rules or empty string
-     *         if matches all rules and specified error message what rules don't
-     *         match
+     * @param array          the character array to check
+     * @param mustBeRules    the array of must-be rules to check against the
+     *                       character array
+     * @param mustNotBeRules the array of must-not-be rules to check against the
+     *                       character array
+     * @return a string containing error messages for any rules that are not
+     *         satisfied
      */
     public static String matchesRules(char[] array, CharacterRule[] mustBeRules, CharacterRule[] mustNotBeRules) {
-        List<String> errors = new ArrayList<>();
+        boolean[] mustBeSatisfied = new boolean[mustBeRules.length];
+        StringBuilder errorMessages = new StringBuilder();
+        Set<ErrorString> addedErrors = new HashSet<>();
 
-        for (CharacterRule rule : mustBeRules) {
-            rule.setSatisfied(rule.verify(array));
-            if (!rule.isSatisfied()) {
-                errors.add(rule.getErrorString());
-            }
-        }
+        checkMustBeRules(array, mustBeRules, mustBeSatisfied);
+        checkMustNotBeRules(array, mustNotBeRules, addedErrors, errorMessages);
+        accumulateErrors(mustBeRules, mustBeSatisfied, addedErrors, errorMessages);
 
-        for (CharacterRule rule : mustNotBeRules) {
-            rule.setSatisfied(rule.verify(array));
-            if (rule.isSatisfied()) {
-                errors.add(rule.getErrorString());
-            }
-        }
-
-        return String.join(", ", errors);
+        return errorMessages.toString();
     }
 
     // ---------------------------------------------------------------------------
@@ -492,5 +492,79 @@ public class ArraysUtils {
         T temp = array[i];
         array[i] = array[j];
         array[j] = temp;
+    }
+
+    // -- HW 9 --
+
+    /**
+     * Checks if each character in the given array satisfies the rules defined in
+     * the given array of CharacterRules.
+     *
+     * @param array           the array of characters to check
+     * @param mustBeRules     the array of CharacterRules to check against
+     * @param mustBeSatisfied the array to store the satisfaction of each rule
+     */
+    private static void checkMustBeRules(char[] array, CharacterRule[] mustBeRules, boolean[] mustBeSatisfied) {
+        for (char ch : array) {
+            for (int i = 0; i < mustBeRules.length; i++) {
+                if (mustBeRules[i].predicate.test(ch)) {
+                    mustBeSatisfied[i] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks the given character array against the given array of MustNotBeRules
+     * and appends any errors to the
+     * errorMessages StringBuilder.
+     *
+     * @param array          the character array to check against the MustNotBeRules
+     * @param mustNotBeRules the array of MustNotBeRules to check against the
+     *                       character array
+     * @param addedErrors    the set of ErrorStrings that have already been added to
+     *                       the errorMessages StringBuilder
+     * @param errorMessages  the StringBuilder to append any errors to
+     */
+    private static void checkMustNotBeRules(char[] array, CharacterRule[] mustNotBeRules, Set<ErrorString> addedErrors,
+            StringBuilder errorMessages) {
+        for (char ch : array) {
+            for (CharacterRule rule : mustNotBeRules) {
+                if (rule.predicate.test(ch) && addedErrors.add(rule.errorString)) {
+                    appendErrorMessage(errorMessages, rule.errorString);
+                }
+            }
+        }
+    }
+
+    /**
+     * Accumulates errors based on the given rules.
+     *
+     * @param mustBeRules     the array of CharacterRules to check against
+     * @param mustBeSatisfied the array to store the satisfaction of each rule
+     * @param addedErrors     the set of ErrorStrings that have already been added
+     *                        to the errorMessages StringBuilder
+     * @param errorMessages   the StringBuilder to append any errors to
+     */
+    private static void accumulateErrors(CharacterRule[] mustBeRules, boolean[] mustBeSatisfied,
+            Set<ErrorString> addedErrors, StringBuilder errorMessages) {
+        for (int i = 0; i < mustBeRules.length; i++) {
+            if (!mustBeSatisfied[i] && mustBeRules[i].isSatisfied && addedErrors.add(mustBeRules[i].errorString)) {
+                appendErrorMessage(errorMessages, mustBeRules[i].errorString);
+            }
+        }
+    }
+
+    /**
+     * Appends an error message to the given StringBuilder if it is not empty.
+     *
+     * @param errorMessages the StringBuilder to append the error message to
+     * @param errorString   the ErrorString containing the error message to append
+     */
+    private static void appendErrorMessage(StringBuilder errorMessages, ErrorString errorString) {
+        if (errorMessages.length() > 0) {
+            errorMessages.append(", ");
+        }
+        errorMessages.append(errorString.getErrorMessage());
     }
 }

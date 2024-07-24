@@ -5,8 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * @since HW9
@@ -21,52 +20,14 @@ class RuleMatcherTest {
     @BeforeEach
     public void setUp() {
         mustBeRules = new CharacterRule[] {
-                new CharacterRule(array -> {
-                    for (char c : array) {
-                        if (Character.isUpperCase(c)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }, ErrorString.UPPERCASE_REQUIRED),
-
-                new CharacterRule(array -> {
-                    for (char c : array) {
-                        if (Character.isLowerCase(c)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }, ErrorString.LOWERCASE_REQUIRED),
-
-                new CharacterRule(array -> {
-                    for (char c : array) {
-                        if (Character.isDigit(c)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }, ErrorString.DIGIT_REQUIRED),
-
-                new CharacterRule(array -> {
-                    for (char c : array) {
-                        if (c == '.') {
-                            return true;
-                        }
-                    }
-                    return false;
-                }, ErrorString.DOT_REQUIRED)
+                new CharacterRule(true, Character::isUpperCase, ErrorString.UPPERCASE_REQUIRED),
+                new CharacterRule(true, Character::isLowerCase, ErrorString.LOWERCASE_REQUIRED),
+                new CharacterRule(true, Character::isDigit, ErrorString.DIGIT_REQUIRED),
+                new CharacterRule(true, ch -> ch == '.', ErrorString.DOT_REQUIRED)
         };
 
         mustNotBeRules = new CharacterRule[] {
-                new CharacterRule(array -> {
-                    for (char c : array) {
-                        if (Character.isWhitespace(c)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }, ErrorString.SPACES_NOT_ALLOWED)
+                new CharacterRule(false, Character::isWhitespace, ErrorString.SPACES_NOT_ALLOWED)
         };
     }
 
@@ -76,12 +37,6 @@ class RuleMatcherTest {
 
         String result = ArraysUtils.matchesRules(validArray, mustBeRules, mustNotBeRules);
         assertEquals(EMPTY_STRING, result);
-
-        assertTrue(mustBeRules[0].isSatisfied());
-        assertTrue(mustBeRules[1].isSatisfied());
-        assertTrue(mustBeRules[2].isSatisfied());
-        assertTrue(mustBeRules[3].isSatisfied());
-        assertFalse(mustNotBeRules[0].isSatisfied());
     }
 
     @Test
@@ -89,13 +44,7 @@ class RuleMatcherTest {
         char[] invalidArray = { 'a', 'n', '*', 'G', '.', '.', '1', ' ' };
 
         String result = ArraysUtils.matchesRules(invalidArray, mustBeRules, mustNotBeRules);
-        assertEquals(ErrorString.SPACES_NOT_ALLOWED.getErrorString(), result);
-
-        assertTrue(mustBeRules[0].isSatisfied());
-        assertTrue(mustBeRules[1].isSatisfied());
-        assertTrue(mustBeRules[2].isSatisfied());
-        assertTrue(mustBeRules[3].isSatisfied());
-        assertTrue(mustNotBeRules[0].isSatisfied());
+        assertEquals(ErrorString.SPACES_NOT_ALLOWED.getErrorMessage(), result);
     }
 
     @Test
@@ -103,13 +52,7 @@ class RuleMatcherTest {
         char[] invalidArray = { 'a', 'n', '*', '.', '.', '1' };
 
         String result = ArraysUtils.matchesRules(invalidArray, mustBeRules, mustNotBeRules);
-        assertEquals(ErrorString.UPPERCASE_REQUIRED.getErrorString(), result);
-
-        assertFalse(mustBeRules[0].isSatisfied());
-        assertTrue(mustBeRules[1].isSatisfied());
-        assertTrue(mustBeRules[2].isSatisfied());
-        assertTrue(mustBeRules[3].isSatisfied());
-        assertFalse(mustNotBeRules[0].isSatisfied());
+        assertEquals(ErrorString.UPPERCASE_REQUIRED.getErrorMessage(), result);
     }
 
     @Test
@@ -117,14 +60,7 @@ class RuleMatcherTest {
         char[] invalidArray = { 'a', 'n', '*', 'G', '.', '.' };
 
         String result = ArraysUtils.matchesRules(invalidArray, mustBeRules, mustNotBeRules);
-        assertEquals(ErrorString.DIGIT_REQUIRED.getErrorString(), result);
-
-        assertTrue(mustBeRules[0].isSatisfied());
-        assertTrue(mustBeRules[1].isSatisfied());
-        assertFalse(mustBeRules[2].isSatisfied());
-        assertTrue(mustBeRules[3].isSatisfied());
-        assertFalse(mustNotBeRules[0].isSatisfied());
-
+        assertEquals(ErrorString.DIGIT_REQUIRED.getErrorMessage(), result);
     }
 
     @Test
@@ -133,16 +69,10 @@ class RuleMatcherTest {
 
         String result = ArraysUtils.matchesRules(invalidArray, mustBeRules, mustNotBeRules);
         assertEquals(String.join(", ",
-                ErrorString.UPPERCASE_REQUIRED.getErrorString(),
-                ErrorString.DIGIT_REQUIRED.getErrorString(),
-                ErrorString.SPACES_NOT_ALLOWED.getErrorString()),
+                ErrorString.SPACES_NOT_ALLOWED.getErrorMessage(),
+                ErrorString.UPPERCASE_REQUIRED.getErrorMessage(),
+                ErrorString.DIGIT_REQUIRED.getErrorMessage()),
                 result);
-
-        assertFalse(mustBeRules[0].isSatisfied());
-        assertTrue(mustBeRules[1].isSatisfied());
-        assertFalse(mustBeRules[2].isSatisfied());
-        assertTrue(mustBeRules[3].isSatisfied());
-        assertTrue(mustNotBeRules[0].isSatisfied());
     }
 
     @Test
@@ -151,18 +81,12 @@ class RuleMatcherTest {
 
         String result = ArraysUtils.matchesRules(invalidArray, mustBeRules, mustNotBeRules);
         assertEquals(String.join(", ",
-                ErrorString.UPPERCASE_REQUIRED.getErrorString(),
-                ErrorString.LOWERCASE_REQUIRED.getErrorString(),
-                ErrorString.DIGIT_REQUIRED.getErrorString(),
-                ErrorString.DOT_REQUIRED.getErrorString(),
-                ErrorString.SPACES_NOT_ALLOWED.getErrorString()),
+                ErrorString.SPACES_NOT_ALLOWED.getErrorMessage(),
+                ErrorString.UPPERCASE_REQUIRED.getErrorMessage(),
+                ErrorString.LOWERCASE_REQUIRED.getErrorMessage(),
+                ErrorString.DIGIT_REQUIRED.getErrorMessage(),
+                ErrorString.DOT_REQUIRED.getErrorMessage()),
                 result);
-
-        assertFalse(mustBeRules[0].isSatisfied());
-        assertFalse(mustBeRules[1].isSatisfied());
-        assertFalse(mustBeRules[2].isSatisfied());
-        assertFalse(mustBeRules[3].isSatisfied());
-        assertTrue(mustNotBeRules[0].isSatisfied());
     }
 
     @Test
@@ -171,17 +95,10 @@ class RuleMatcherTest {
 
         String result = ArraysUtils.matchesRules(invalidArray, mustBeRules, mustNotBeRules);
         assertEquals(String.join(", ",
-                ErrorString.UPPERCASE_REQUIRED.getErrorString(),
-                ErrorString.LOWERCASE_REQUIRED.getErrorString(),
-                ErrorString.DIGIT_REQUIRED.getErrorString(),
-                ErrorString.DOT_REQUIRED.getErrorString()),
+                ErrorString.UPPERCASE_REQUIRED.getErrorMessage(),
+                ErrorString.LOWERCASE_REQUIRED.getErrorMessage(),
+                ErrorString.DIGIT_REQUIRED.getErrorMessage(),
+                ErrorString.DOT_REQUIRED.getErrorMessage()),
                 result);
-
-        assertFalse(mustBeRules[0].isSatisfied());
-        assertFalse(mustBeRules[1].isSatisfied());
-        assertFalse(mustBeRules[2].isSatisfied());
-        assertFalse(mustBeRules[3].isSatisfied());
-        assertFalse(mustNotBeRules[0].isSatisfied());
     }
-
 }

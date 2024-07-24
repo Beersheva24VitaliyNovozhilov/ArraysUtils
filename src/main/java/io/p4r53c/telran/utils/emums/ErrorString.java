@@ -8,14 +8,14 @@ public enum ErrorString {
     DOT_REQUIRED("At least one dot required"),
     SPACES_NOT_ALLOWED("Spaces are not allowed");
 
-    private final String errorString;
+    private final String errorMessage;
 
-    ErrorString(String errorString) {
-        this.errorString = errorString;
+    ErrorString(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
-    public String getErrorString() {
-        return errorString;
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
 }

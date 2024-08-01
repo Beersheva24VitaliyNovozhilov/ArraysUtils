@@ -6,6 +6,7 @@
     <groupId>io.p4r53c.telran.untils</groupId>
     <artifactId>arrays</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>

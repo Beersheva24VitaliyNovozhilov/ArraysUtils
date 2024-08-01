@@ -374,11 +374,7 @@ public class ArraysUtils {
         return errorMessages.toString();
     }
 
-    // ---------------------------------------------------------------------------
-    //
-    // Private methods
-    //
-    // ---------------------------------------------------------------------------
+
 
     /**
      * Finds the index of the first unsorted element in the given array.
@@ -420,7 +416,7 @@ public class ArraysUtils {
      * @param array the array to be checked
      * @return true if the array is sorted, false otherwise
      */
-    private static boolean isSorted(int[] array) {
+    public static boolean isSorted(int[] array) {
         // For sake of simplicity.
         // This method can be implemented by while loop but It's just a helper method.
         return array.length != 0 && IntStream.range(1, array.length).noneMatch(i -> array[i - 1] > array[i]);
@@ -435,7 +431,7 @@ public class ArraysUtils {
      * @param value the value to be inserted
      * @return a new array with the value inserted at the specified index
      */
-    private static <T> T[] insertSorted(T[] array, int index, T value) {
+    public static <T> T[] insertSorted(T[] array, int index, T value) {
         T[] result = Arrays.copyOf(array, array.length + 1);
 
         System.arraycopy(array, index, result, index + 1, array.length - index);
@@ -485,7 +481,7 @@ public class ArraysUtils {
      * @param j     the index of the second element to be swapped
      * @param <T>   the type of elements in the array
      */
-    private static <T> void swap(T[] array, int i, int j) {
+    public static <T> void swap(T[] array, int i, int j) {
         T temp = array[i];
         array[i] = array[j];
         array[j] = temp;
